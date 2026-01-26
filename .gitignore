@@ -1,0 +1,42 @@
+# ==== Python ====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ==== Model checkpoints ====
+*.pt
+*.pth
+*.ckpt
+
+# ==== Virtual envs ====
+.venv/
+venv/
+env/
+deep-env/
+
+# ==== OS junk ====
+.DS_Store
+Thumbs.db
+
+# ==== Outputs (si no quieres versionar figuras/gifs) ====
+eval/*.png
+train/*.png
+*.gif
+
+# ==== Logs / runs ====
+*.log
+runs/
+
+
+# ==== EXCEPCIONES ====
+
+# loss de entrenamiento
+!train/loss_evolution_huber_train.png
+
+
+# eval plots (elige 5 y 9 como dijiste)
+!eval/test_error_hist_s5.png
+!eval/test_error_hist_s9.png
+!eval/test_scatter_s5.png
+!eval/test_scatter_s9.png
