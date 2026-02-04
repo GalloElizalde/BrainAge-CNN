@@ -2,58 +2,105 @@
 
 This project predicts **chronological age from brain MRI** using a convolutional neural network (CNN).
 
-The goal is to build a **simple and reproducible baseline** for brain age regression using a small number of MRI slices. This is **not a state-of-the-art model**, but a clean end-to-end medical imaging + ML pipeline.
+The goal is to build a **simple, reproducible baseline** for predicting chronological age from brain MRI, while explicitly studying how the **number of input slices** affects regression performance.
 
-## What the project does
+The aim is create an interpretable end-to-end machine learning pipeline for medical imaging, prioritizing transparency and reproducibility over state-of-the-art performance.
 
-- Loads structural MRI data from the OASIS dataset
-- Extracts 15 axial slices from the central part of each brain volume
-- Stacks slices as channels and feeds them to a 2D CNN
-- Trains the model to predict age in years
+## Problem formulation
+
+- Task: supervised regression
+- Input: structural T1-weighted brain MRI
+- Output: chronological age (continuous, in years)
+
+---
+
+## Pipeline overview
+
+For each subject:
+
+- Load a 3D MRI volume
+- Extract a fixed number of axial slices from the central brain region
+- Stack slices as channels
+- Train a CNN to regress age
+
+The project evaluates multiple configurations with different numbers of slices.
+
+---
 
 ## Dataset
 
-- Dataset: OASIS
+- Dataset: OASIS (Open Access Series of Imaging Studies)
 - Number of subjects: 351
 - Target variable: chronological age
 
-### Slice selection
+---
 
-- 15 axial slices per subject
-- Uniformly sampled between 25% and 75% of the Z-axis
-- Input shape: (15, H, W)
+## Slice sampling
+
+- Axial slices are sampled uniformly between **25% and 75%** of the Z-axis
+- The number of slices is a configurable parameter
+
+Experiments are run with:
+- 1 slice
+- 3 slices
+- 5 slices
+- 9 slices
+- 15 slices
+
+Input tensor shape:
+- `(n_slices, H, W)`
+
+This allows studying the trade-off between spatial information and model complexity.
+
+---
 
 ## Preprocessing
 
-- MRI volumes loaded with nibabel
+- MRI volumes loaded using nibabel
 - Per-subject z-score normalization
-- No skull stripping or heavy preprocessing
+- No skull stripping or spatial normalization
+- Same preprocessing for all slice configurations
+
+---
 
 ## Model
 
-- 2D CNN implemented in PyTorch
-- 3 convolutional blocks (Conv + BatchNorm + ReLU)
+- 2D convolutional neural network (PyTorch)
+- Three convolutional blocks:
+  - Conv2D + BatchNorm + ReLU
 - Global average pooling
 - Linear regression head
+- Same architecture used for all experiments (only input channels change)
 
-## Training
+---
 
-- Train / validation split: 70% / 15%
+## Training setup
+
+- Supervised regression
+- Loss function: Huber loss
 - Optimizer: AdamW
-- Loss used for training: Huber loss
-- Metrics monitored: MAE and MSE
+- Train / validation / test split
 - Fixed random seeds for reproducibility
+- Best model selected based on validation performance
+
+---
 
 ## Evaluation
 
+Model performance is evaluated on a held-out test set using:
+
 - Mean Absolute Error (MAE)
 - Root Mean Squared Error (RMSE)
-- Bias (mean error)
-- Pearson correlation
+- Bias (mean signed error)
+- Pearson correlation coefficient
 - R2 score
-- Error histograms
-- Predicted vs true age scatter plot
-- MAE by age bins
+- Error distribution histograms
+- Predicted vs true age scatter plots
+- MAE stratified by age bins
+
+Results are compared across different numbers of input slices.
+
+---
 
 ## Repository structure
 
@@ -63,8 +110,20 @@ BrainAge-CNN/
 ├── model.py
 ├── train.py
 ├── eval.py
+├── plot.py
+├── data_visualization.py
 └── README.md
 
-## Notes
+---
 
-This project is intended as a baseline and learning project for medical imaging and machine learning. It is designed to be easy to understand, modify, and extend.
+
+## Dataset reference
+
+This project uses data from the **OASIS (Open Access Series of Imaging Studies)** dataset.
+
+Marcus, D. S., Wang, T. H., Parker, J., Csernansky, J. G., Morris, J. C., & Buckner, R. L.  
+*Open Access Series of Imaging Studies (OASIS): Cross-sectional MRI data in young, middle-aged, nondemented, and demented older adults.*  
+Journal of Cognitive Neuroscience, 19(9), 1498–1507, 2007.
+
+https://www.oasis-brains.org
+
